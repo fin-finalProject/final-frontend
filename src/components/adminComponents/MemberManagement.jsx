@@ -71,6 +71,7 @@ const MemberManagement = () =>{
 
             const newMemberOrders = response.data.content.map(member => member.order).flat();
             setMemberOrder(newMemberOrders);
+            setTotalPages(response.data.totalPages)
         } catch (error) {
             console.error('회원 목록을 불러오는 중 에러 발생:', error);
         }
@@ -179,7 +180,7 @@ const MemberManagement = () =>{
                         
                         </React.Fragment>
             </Table>
-            <PaginationContainer>
+        <PaginationContainer>
         <PaginationButton onClick={handlePreviousPage} disabled={currentPage === 0}>이전</PaginationButton>
         {[...Array(totalPages)].map((_, index) => (
           <PaginationButton key={index} onClick={() => handlePageClick(index)}>
