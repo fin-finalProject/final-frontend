@@ -42,7 +42,7 @@ const Cart = () => {
     let newBookPrices = {};
     if(checked){
         const isbnArray = cartInfoList.map(item => item.isbn);
-        setCheckItems(isbnArray);
+        setCheckItems(cartInfoList);
 
         for (let i = 0; i < cartInfoList.length; i++) {
             let price = bookCount[i] * cartInfoList[i].salePrice;
@@ -62,52 +62,36 @@ const Cart = () => {
       
   useEffect(() => {
     const total = Object.values(bookPrice).reduce((acc, curr) => acc + curr, 0);
-    // let total = 0;
-    // console.log(isbnBookCount);
-    // for (const key in bookPrice) {
-    //   total += parseInt(isbnBookCount[key]) * parseInt(bookPrice[key]);
-    // }
-    // console.log('이쪽', total);
     setProductTotal(total);
   },[bookCount]); 
 
   useEffect(() => {
     let total = 0;
-    console.log(bookCount)
-    console.log(bookPrice);
+    console.log('bookCount', bookCount)
+    console.log('bookPrice', bookPrice);
     
-    total = checkItems.reduce((acc, isbn) => {
-      if (bookPrice.hasOwnProperty(isbn)) {
-        const price = bookPrice[isbn];
+    total = Object.keys(checkItems).reduce((acc, curr) => {
+      const book = checkItems[curr];
+      if (bookPrice.hasOwnProperty(book.isbn)) {
+        const price = bookPrice[book.isbn];
         acc += price;
       }
       return acc;
     }, 0);
-  
-    console.log('이쪽', total);
+    
+    console.log('checkItems', checkItems)
+    console.log('총금액', total);
     setProductTotal(total);
   }, [checkItems, bookCount, bookPrice]);
      
-  // const calculateTotalPrice = useCallback(() => {
-  //   let total = 0;
-  //   console.log('bookPrice', bookPrice);
-  //   for (const key in bookPrice) {
-  //     total += parseInt(bookPrice[key]);
-  //   }
-  //   setProductTotal(total);
-  //   console.log(total);
-  // }, [bookPrice]);
 
-  // useEffect(() => {
-  //   calculateTotalPrice();
-  // }, [calculateTotalPrice]);
     
   //주문 페이지 이동
   const navigate = useNavigate();
   const toOrder = () =>{
     if(checkItems.length>0){
       navigate('/order', {state: {
-        cartArray: cartInfoList,
+        cartArray: checkItems,
         bookCount: bookCount,
       }});
     }else{
@@ -146,8 +130,6 @@ const Cart = () => {
         cartInfoList={cartInfoList}
         bookCount={bookCount}
         setBookCount={setBookCount}
-        isbnBookCount={isbnBookCount}
-        setIsbnBookCount={setIsbnBookCount}
         bookPrice={bookPrice}
         setBookPrice={setBookPrice}
         checkItems={checkItems}

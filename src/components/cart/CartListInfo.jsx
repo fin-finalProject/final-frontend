@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Divider } from "@mui/material";
 
 
-const CartListInfo = ({cartInfoList, isbnBookCount, setIsbnBookCount, bookCount,setBookCount, bookPrice,setBookPrice, checkItems, setCheckItems,removeFromCart }) => {
+const CartListInfo = ({cartInfoList, bookCount,setBookCount, bookPrice,setBookPrice, checkItems, setCheckItems,removeFromCart }) => {
 
   useEffect(()=>{
 
@@ -32,14 +32,18 @@ const CartListInfo = ({cartInfoList, isbnBookCount, setIsbnBookCount, bookCount,
     setBookPrice({...bookPrice, [isbn]: updatedPrice});
 };
 
-  const handleSingleCheck = (isbn, totalPrice, checked) =>{
+  const handleSingleCheck = (book, totalPrice, checked) =>{
     if(checked){
-      setCheckItems(prev => [...prev,isbn]);
-      setBookPrice({...bookPrice, [isbn]:totalPrice});
+      setCheckItems((prev) => [...prev, book]);
+      setBookPrice({...bookPrice, [book.isbn]:totalPrice});
     }else{
-      setCheckItems(checkItems.filter((el) => el !== isbn));
-      setBookPrice({...bookPrice, [isbn]: 0});
+      setCheckItems(checkItems.filter((el) => el.isbn !== book.isbn));
+      setBookPrice({...bookPrice, [book.isbn]: 0});
     }
+  }
+
+  const isChecked = (book) =>{
+    return checkItems.some((item) => item.isbn === book.isbn);
   }
 
 
@@ -55,8 +59,8 @@ const CartListInfo = ({cartInfoList, isbnBookCount, setIsbnBookCount, bookCount,
               <CheckBox
                 type="checkbox"
                 name={`select-${book.isbn}`}
-                onChange={(e) => handleSingleCheck(book.isbn, totalPrice, e.target.checked)}
-                checked={checkItems.includes(book.isbn) ? true : false}
+                onChange={(e) => handleSingleCheck(book, totalPrice, e.target.checked)}
+                checked={isChecked(book) ? true : false}
               />
               <Img>
                 <img src={book.thumbnail ? book.thumbnail : 'http://via.placeholder.com/120X150'} alt="" />
