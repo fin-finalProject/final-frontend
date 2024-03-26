@@ -6,20 +6,20 @@ import { Link } from "react-router-dom";
 
 const OrderList = ({handleTabClick, setOrderDetailList }) =>{
     const [orders, setOrders] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const headers = GetTokenToHeader();
-                const response = await axios.get('/order/loadMyOrder', headers);
-                console.log(response.data.myOrder);
-                setOrders(response.data.myOrder);
-            } catch (error) {
-                console.error('주문 목록을 불러오는 중 에러 발생:', error);
-            }
-        };
-        fetchOrders();
-    }, []);
+    const fetchOrders = async (page) => {
+        try {
+            const headers = GetTokenToHeader();
+            const response = await axios.get(`/order/loadMyOrder?page=${page}`, headers);
+            console.log(response.data);
+            setOrders(response.data.myOrder);
+            setTotalPages(response.data.page);
+        } catch (error) {
+            console.error('주문 목록을 불러오는 중 에러 발생:', error);
+        }
+    };
 
     function formatDateTime(dateTimeStr) {
         if(dateTimeStr){
@@ -34,6 +34,22 @@ const OrderList = ({handleTabClick, setOrderDetailList }) =>{
         handleTabClick(4);
         setOrderDetailList(orderDetailList);
     };
+
+    const handlePreviousPage = () => {
+        setCurrentPage(currentPage - 1);
+      };
+    
+      const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+      };
+    
+      const handlePageClick = (page) => {
+        setCurrentPage(page);
+      };
+
+      useEffect(()=>{
+        fetchOrders(currentPage);
+      },[currentPage])
 
     return(
         <Wrapper>
@@ -69,6 +85,15 @@ const OrderList = ({handleTabClick, setOrderDetailList }) =>{
                         
                         </React.Fragment>
             </Table>
+            <PaginationContainer>
+                <PaginationButton onClick={handlePreviousPage} disabled={currentPage === 0}>이전</PaginationButton>
+                {[...Array(totalPages)].map((_, index) => (
+                <PaginationButton key={index} onClick={() => handlePageClick(index)}>
+                    {index + 1}
+                </PaginationButton>
+                ))}
+                <PaginationButton onClick={handleNextPage} disabled={currentPage === totalPages - 1}>다음</PaginationButton>
+            </PaginationContainer>
         </Wrapper>
         
     );
@@ -140,3 +165,23 @@ const TitleText = styled.div`
     }
 `;
 
+const PaginationContainer = styled.div`
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    // background-color: #FFC0CB;
+`;
+
+const PaginationButton = styled.button`
+    margin: 0 5px; /* 수정된 부분: 좌우 마진 추가 */
+    padding: 5px 10px;
+    border: 1px solid #ffffff;
+    cursor: pointer;
+    color: #ffffff;
+    background-color: #FFC0CB;
+
+    // &:disabled {
+    //     opacity: 0.5;
+    //     cursor: not-allowed;
+    // }
+`;
