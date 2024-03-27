@@ -80,6 +80,19 @@ const Payment = ({cartInfoList, bookCount, totalPrice, selectedPaymentMethod, de
               const response = await axios.post(`order/add`, orderDTO, headers);
               if(response.status === 200){
                 alert('결제 성공');
+                axios({
+                  method: 'delete',
+                  url: '/cart/orderSucceed/delete',
+                  data: cartInfoList,
+                  headers: headers
+                })
+                .then(response => {
+                  console.log(response.data);
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+
                 navigate('/order/success');
               }else{
                 alert('결제 도중 오류 발생');
